@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>Game Time</title>
+
+<style>
+body {
+    font-family: helvetica, arial, sans-serif;
+}
+
+#time {
+    font-size: 72pt;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<div id="time">00:00</div>
+
+<div id="controls">
+    <input type="button" id="back60" value="-60">
+    <input type="button" id="back30" value="-30">
+    <input type="button" id="back15" value="-15">
+    <input type="button" id="back5" value="-5">
+    <input type="button" id="fwd5" value="+5">
+    <input type="button" id="fwd15" value="+15">
+    <input type="button" id="fwd30" value="+30">
+    <input type="button" id="fwd60" value="+60">
+    <br>
+
+    <input type="button" id="backX" value="-">
+    <input type="button" id="fwdX" value="+">
+    <input type="number" id="X" value="0" maxlength="4" min="0" max="9999">
+    <br>
+
+    <input type="button" id="setTo" value="set">
+    <input type="number" id="hrs" value="0" maxlength="2" min="0" max="23">:
+    <input type="number" id="mins" value="0" maxlength="2" min="0" max="59">
+</div>
+
+<div>
+    <h2>Suggestions</h2>
+    <ul>
+        <li>1 Simple task = 15 mins & 1 complex task = 1 hour</li>
+        <li>10 minutes to search a room (and ask them which aspect, walls,
+            floor, the barrels, etc.)</li>
+        <li>5 minutes to disarm traps or pick a lock if proficient with
+            thieves tools; 10 minutes otherwise. This assumes fairly
+            straightforward mechanisms, not complex puzzles.</li>
+        <li>Too much disagreement at the table about which way to go,
+            or what to do, or where to look = 10 minutes and random
+            encounter check.</li>
+        <li>200 ft movement in a dungeon (slow) per 10 minutes. This
+            allows characters to keep a simple map of where they are
+            (if they want).</li>
+    </ul>
+    <p>Cited from <a href="https://rpg.stackexchange.com/questions/55461/how-to-handle-time-in-dd-5e">https://rpg.stackexchange.com/questions/55461/how-to-handle-time-in-dd-5e</a></p>
+</div>
+
+<script>
+
+var curTime = 0;
+var minsInHour = 60;
+var hoursInDay = 24;
+var maxTime = minsInHour * hoursInDay;
+
+document.getElementById("back60").addEventListener("click", function(){
+    changeTime(-60);
+});
+
+document.getElementById("back30").addEventListener("click", function(){
+    changeTime(-30);
+});
+
+document.getElementById("back15").addEventListener("click", function(){
+    changeTime(-15);
+});
+
+document.getElementById("back5").addEventListener("click", function(){
+    changeTime(-5);
+});
+
+document.getElementById("fwd5").addEventListener("click", function(){
+    changeTime(5);
+});
+
+document.getElementById("fwd15").addEventListener("click", function(){
+    changeTime(15);
+});
+
+document.getElementById("fwd30").addEventListener("click", function(){
+    changeTime(30);
+});
+
+document.getElementById("fwd60").addEventListener("click", function(){
+    changeTime(60);
+});
+
+document.getElementById("backX").addEventListener("click", function(){
+    var X = Math.abs(Number(document.getElementById("X").value));
+    if(X) { changeTime(-X); }
+});
+
+document.getElementById("fwdX").addEventListener("click", function(){
+    var X = Math.abs(Number(document.getElementById("X").value));
+    if(X) { changeTime(X); }
+});
+
+document.getElementById("setTo").addEventListener("click", function(){
+    var hrs = Number(document.getElementById("hrs").value);
+    var mins = Number(document.getElementById("mins").value);
+    var newTime = hrs * minsInHour + mins;
+    curTime = newTime;
+    refreshTime();
+});
+
+changeTime = function(byHowMuch) {
+    curTime += byHowMuch;
+    if(curTime < 0) {
+        curTime = maxTime - Math.abs(curTime);
+    } else if(curTime > maxTime) {
+        curTime = curTime - maxTime;
+    } else if(curTime == maxTime) {
+        curTime = 0;
+    }
+    refreshTime();
+};
+
+refreshTime = function() {
+    var hours = Math.floor(curTime / minsInHour);
+    var mins = curTime % minsInHour;
+
+    document.getElementById("time").innerHTML =
+            hours.pad(2) + ":" + mins.pad(2);
+};
+
+Number.prototype.pad = function(size) {
+    var s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+};
+
+</script>
+
+</body>
+</html>
